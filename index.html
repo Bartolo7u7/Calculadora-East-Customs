@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora de East Customs</title>
+  
+  <!-- SDK de Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
   <style>
     :root {
       --primary-yellow: #f1bf00;
@@ -221,7 +226,7 @@
       font-size: 0.85rem;
     }
     .col-unidades input[type="number"] { max-width: 55px; }
-    input:focus { border-color: var(--primary-yellow); box-shadow: 0 0 5px rgba(241, 191, 0, 0.5); }
+    input:focus, select:focus { border-color: var(--primary-yellow); box-shadow: 0 0 5px rgba(241, 191, 0, 0.5); }
     input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
 
@@ -269,10 +274,19 @@
     .modal-header { background-color: var(--primary-yellow); color: #000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
     .modal-header h2 { font-size: 1.1rem; }
     .close-btn { font-size: 1.5rem; font-weight: bold; cursor: pointer; line-height: 1; }
-    .modal-body { padding: 20px; color: var(--text-white); font-family: 'Arial', sans-serif; font-size: 0.9rem; max-height: 60vh; overflow-y: auto; background-color: rgba(10, 10, 10, 0.95); }
+    .modal-body { padding: 20px; color: var(--text-white); font-family: 'Arial', sans-serif; font-size: 0.9rem; max-height: 70vh; overflow-y: auto; background-color: rgba(10, 10, 10, 0.95); }
     .summary-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #555; padding-bottom: 8px; }
-    .summary-total { font-size: 1.2rem; font-weight: 900; color: var(--primary-yellow); text-align: right; margin-top: 15px; font-family: 'Arial Black', sans-serif; }
+    .summary-total { font-size: 1.3rem; font-weight: 900; color: var(--primary-yellow); text-align: right; margin-top: 10px; font-family: 'Arial Black', sans-serif; }
     .modal-footer { padding: 15px; display: flex; gap: 10px; background-color: rgba(10, 10, 10, 0.95); border-top: 1px solid var(--border-color); }
+
+    /* Select de Descuentos en Modal */
+    .discount-select {
+      width: 100%; padding: 8px; margin-top: 8px; 
+      background-color: rgba(0,0,0,0.8); color: #fff; 
+      border: 1px solid var(--border-color); border-radius: 4px; 
+      font-weight: bold; outline: none; cursor: pointer;
+    }
+    .discount-select:focus { border-color: var(--primary-yellow); }
 
     /* ESTILOS ESPECÍFICOS HISTORIAL Y MECÁNICO */
     .login-box { max-width: 400px; margin: 50px auto; text-align: center; padding: 30px 20px; }
@@ -522,7 +536,7 @@
               <button class="btn btn-outline" onclick="resetForm()">REINICIAR</button>
             </div>
   
-            <!-- Descuentos Aplicados -->
+            <!-- Descuentos Aplicados (Solo visual informativo) -->
             <div class="info-card panel">
               <div class="info-header">DESCUENTOS APLICADOS</div>
               <div class="info-content">
@@ -543,8 +557,8 @@
               <div class="info-header">REGLAMENTO DESCUENTOS</div>
               <div class="info-content">
                 <ul class="rules-list">
-                  <li>1. El valor en <strong>A PAGAR</strong> es el monto final que debe cobrarse al cliente.</li>
-                  <li>2. Solo por <strong>convenio</strong> o <strong>precio mecánico</strong>.</li>
+                  <li>1. El valor final con descuento se elige al generar el ticket.</li>
+                  <li>2. Solo por <strong>convenio (5%)</strong> o <strong>precio mecánico (10%)</strong>.</li>
                 </ul>
               </div>
             </div>
@@ -585,7 +599,7 @@
                 <th>FECHA Y HORA</th>
                 <th>MECÁNICO</th>
                 <th>DETALLE DE LA VENTA</th>
-                <th>TOTAL</th>
+                <th>TOTAL COBRADO</th>
               </tr>
             </thead>
             <tbody id="history-body">
@@ -605,9 +619,27 @@
         <h2>TICKET DE VENTA</h2>
         <span class="close-btn" onclick="closeModal()">&times;</span>
       </div>
-      <div class="modal-body" id="sale-summary-content">
-        <!-- Contenido Inyectado -->
+      
+      <div class="modal-body">
+        <div id="sale-summary-content">
+          <!-- Contenido Inyectado (Piezas) -->
+        </div>
+
+        <!-- SELECCIÓN DE DESCUENTOS EN EL MODAL -->
+        <div style="margin-top: 15px; border-top: 1px dashed #555; padding-top: 15px;">
+          <label style="color: var(--primary-yellow); font-weight: bold; font-size: 0.85rem;">APLICAR DESCUENTO:</label>
+          <select id="modal-discount-select" class="discount-select" onchange="updateModalTotal()">
+            <option value="0">Ninguno (0%)</option>
+            <option value="5">Convenio (5%)</option>
+            <option value="10">Precio Mecánico (10%)</option>
+          </select>
+        </div>
+
+        <div id="modal-dynamic-total" style="margin-top: 15px;">
+          <!-- Contenido inyectado (Totales y Descuentos calculados) -->
+        </div>
       </div>
+      
       <div class="modal-footer">
         <button class="btn btn-green" onclick="confirmAndCopySale()">CONFIRMAR Y COPIAR</button>
         <button class="btn btn-outline" onclick="closeModal()">CANCELAR</button>
@@ -616,18 +648,65 @@
   </div>
 
   <script>
-    /* --- VARIABLES GLOBALES DEL SISTEMA --- */
-    let currentMechanic = "Anónimo";
-    let salesHistory = [];
-    let pendingSaleData = null; // Almacena temporalmente la venta antes de confirmarla
+    /* --- FIREBASE CONFIG --- */
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkkQH61q02b9N0v7br910KXtYxAaR71Wc",
+      authDomain: "calculadora-east-customs.firebaseapp.com",
+      projectId: "calculadora-east-customs",
+      storageBucket: "calculadora-east-customs.firebasestorage.app",
+      messagingSenderId: "714737482083",
+      appId: "1:714737482083:web:566f2c2158f658a517bb56"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    /* --- UTILIDADES --- */
+    let currentMechanic = localStorage.getItem('ec_mechanic') || "Anónimo";
+    let pendingSaleData = null;
+
+    // Sincronización en tiempo real con Firebase
+    db.collection("sales").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+      const tbody = document.getElementById('history-body');
+      tbody.innerHTML = '';
+      snapshot.forEach((doc) => {
+        const s = doc.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${s.date}</td><td>${s.mechanic}</td><td style="text-align:left">${s.details}</td><td>$${s.total.toLocaleString('de-DE')}</td><td><button onclick="deleteSale('${doc.id}')" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">X</button></td>`;
+        tbody.appendChild(tr);
+      });
+    });
+
+    /* --- LÓGICA DE FIREBASE --- */
+    function confirmAndCopySale() {
+      if(!pendingSaleData) return;
+      navigator.clipboard.writeText(pendingSaleData.finalCopyText);
+      db.collection("sales").add({
+        date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        mechanic: currentMechanic,
+        details: pendingSaleData.finalHistoryDesc,
+        total: pendingSaleData.finalTotal
+      }).then(() => {
+        alert('Registrado en la nube');
+        closeModal();
+      });
+    }
+
+    function clearHistory() {
+      const pass = "mamawebo";
+      if(prompt("Introduce la contraseña de administrador:") === pass) {
+        db.collection("sales").get().then(res => res.forEach(doc => doc.ref.delete()));
+      }
+    }
+
+    function deleteSale(id) {
+       db.collection("sales").doc(id).delete();
+    }
+
+    /* --- LÓGICA DE LA CALCULADORA (RESTO DE TUS FUNCIONES) --- */
     function formatMoney(amount) {
       return '$' + amount.toLocaleString('de-DE');
     }
-
-    /* --- SISTEMA DE SIDEBAR Y VISTAS --- */
-    function toggleSidebar() {
+    function toggleSidebar() { 
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('sidebar-overlay');
       if(sidebar.classList.contains('open')) {
@@ -636,54 +715,48 @@
       } else {
         sidebar.classList.add('open');
         overlay.style.display = 'block';
-      }
+      } 
     }
-
-    function switchView(viewId) {
-      // Ocultar todas las vistas
+    function switchView(viewId) { 
       document.querySelectorAll('.view-container').forEach(view => {
         view.classList.remove('active');
       });
-      // Quitar clase activa del menú
       document.querySelectorAll('.sidebar-btn').forEach(btn => {
         btn.classList.remove('active-nav');
       });
-
-      // Activar vista seleccionada
       document.getElementById(viewId).classList.add('active');
-      // Activar botón del menú correspondiente
       document.getElementById('nav-' + viewId.split('-')[1]).classList.add('active-nav');
-      
-      toggleSidebar(); // Cerrar menú después de hacer click
+      toggleSidebar();
     }
-
-    /* --- SISTEMA DE LOGIN (MECÁNICO) --- */
-    function loginMechanic() {
+    function loginMechanic() { 
       const input = document.getElementById('mechanic-input').value.trim();
       if (input !== "") {
         currentMechanic = input;
         updateMechanicDisplays();
         document.getElementById('mechanic-input').value = '';
         alert(`Sesión iniciada correctamente como: ${currentMechanic}`);
-        switchView('view-venta'); // Enviar a la calculadora tras loguearse
+        switchView('view-venta'); 
       } else {
         alert("Por favor, ingresa un nombre válido.");
       }
     }
-
-    function logoutMechanic() {
+    function logoutMechanic() { 
       currentMechanic = "Anónimo";
       updateMechanicDisplays();
       alert("Sesión cerrada. Operando como Anónimo.");
     }
-
     function updateMechanicDisplays() {
-      document.getElementById('header-mechanic-name').textContent = `Mecánico: ${currentMechanic}`;
-      document.getElementById('login-status-text').innerHTML = `Actualmente operando como: <strong>${currentMechanic}</strong>`;
+      // Esta función actualiza el texto del nombre del mecánico en el header y en la vista de login
+      const headerDisplay = document.getElementById('header-mechanic-name');
+      const loginStatus = document.getElementById('login-status-text');
+      
+      if (headerDisplay) headerDisplay.textContent = `Mecánico: ${currentMechanic}`;
+      if (loginStatus) loginStatus.innerHTML = `Actualmente operando como: <strong>${currentMechanic}</strong>`;
+      
+      // Guardamos el nombre en el navegador para que no se borre al refrescar
+      localStorage.setItem('ec_mechanic', currentMechanic);
     }
-
-    /* --- CALCULADORA PRINCIPAL --- */
-    function calculate() {
+    function calculate() { 
       let grandTotal = 0;
       const rows = document.querySelectorAll('.item-row');
 
@@ -702,25 +775,21 @@
       document.getElementById('disc-total-10').textContent = formatMoney(grandTotal);
       document.getElementById('disc-pay-10').textContent = formatMoney(Math.round(grandTotal * 0.90));
     }
-
     function resetForm() {
       document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
       calculate();
     }
-
     function copyTotal() {
       const totalText = document.getElementById('grand-total').textContent;
       navigator.clipboard.writeText(totalText).then(() => {
         alert('Monto copiado: ' + totalText);
       }).catch(err => console.error('Error al copiar: ', err));
     }
-
-    /* --- TICKET DE VENTA Y CONFIRMACIÓN --- */
-    function showSaleSummary() {
+    function showSaleSummary() { 
       const rows = document.querySelectorAll('.item-row');
       let summaryHTML = '';
-      let textForCopy = '--- TICKET EAST CUSTOMS ---\n\n';
-      let textForHistory = ''; // Para la tabla pequeña de historial
+      let baseTextForCopy = '--- TICKET EAST CUSTOMS ---\n\n';
+      let textForHistory = ''; 
       let total = 0;
       let hasItems = false;
 
@@ -736,7 +805,7 @@
           total += subtotal;
 
           summaryHTML += `<div class="summary-item"><span>${qty}x ${itemName}</span><span>${formatMoney(subtotal)}</span></div>`;
-          textForCopy += `${qty}x ${itemName}: ${formatMoney(subtotal)}\n`;
+          baseTextForCopy += `${qty}x ${itemName}: ${formatMoney(subtotal)}\n`;
           textForHistory += `${qty}x ${itemName}, `;
         }
       });
@@ -746,65 +815,90 @@
         return;
       }
 
-      summaryHTML += `<div class="summary-total">Total a pagar: ${formatMoney(total)}</div>`;
-      textForCopy += `\nMECÁNICO: ${currentMechanic}\nTOTAL A PAGAR: ${formatMoney(total)}\n-------------------------`;
-      textForHistory = textForHistory.slice(0, -2); // quitar última coma
+      textForHistory = textForHistory.slice(0, -2); 
 
+      // Reiniciar el select a 0%
+      document.getElementById('modal-discount-select').value = "0";
       document.getElementById('sale-summary-content').innerHTML = summaryHTML;
       
-      // Guardar en variable temporal
       pendingSaleData = {
-        copyText: textForCopy,
+        baseTextForCopy: baseTextForCopy,
         historyDetails: textForHistory,
-        total: total
+        baseTotal: total
       };
 
+      updateModalTotal(); // Calcula y pinta el total final
+      document.getElementById('sale-modal').style.display = 'flex';
+    }
+    function showPackageSummary(packageName, price) {
+      let summaryHTML = `<div class="summary-item"><span>1x ${packageName}</span><span>${formatMoney(price)}</span></div>`;
+      let baseTextForCopy = `--- TICKET EAST CUSTOMS ---\n\n1x ${packageName}: ${formatMoney(price)}\n`;
+
+      document.getElementById('modal-discount-select').value = "0";
+      document.getElementById('sale-summary-content').innerHTML = summaryHTML;
+      
+      pendingSaleData = {
+        baseTextForCopy: baseTextForCopy,
+        historyDetails: `1x ${packageName}`,
+        baseTotal: price
+      };
+
+      updateModalTotal(); // Calcula y pinta el total final
       document.getElementById('sale-modal').style.display = 'flex';
     }
 
-    function showPackageSummary(packageName, price) {
-      let summaryHTML = `
-        <div class="summary-item"><span>1x ${packageName}</span><span>${formatMoney(price)}</span></div>
-        <div class="summary-total">Total a pagar: ${formatMoney(price)}</div>
-      `;
+    // Actualiza los números dentro del modal según el descuento elegido
+    function updateModalTotal() {
+      if(!pendingSaleData) return;
       
-      let textForCopy = `--- TICKET EAST CUSTOMS ---\n\n1x ${packageName}: ${formatMoney(price)}\n\nMECÁNICO: ${currentMechanic}\nTOTAL A PAGAR: ${formatMoney(price)}\n-------------------------`;
-
-      document.getElementById('sale-summary-content').innerHTML = summaryHTML;
+      const discountVal = parseInt(document.getElementById('modal-discount-select').value) || 0;
+      const baseTotal = pendingSaleData.baseTotal;
+      const discountAmount = baseTotal * (discountVal / 100);
+      const finalTotal = Math.round(baseTotal - discountAmount);
       
-      pendingSaleData = {
-        copyText: textForCopy,
-        historyDetails: `1x ${packageName}`,
-        total: price
-      };
-
-      document.getElementById('sale-modal').style.display = 'flex';
+      let html = '';
+      if(discountVal > 0) {
+        html += `<div style="font-size: 0.9rem; color: #aaa; text-align: right;">Subtotal: ${formatMoney(baseTotal)}</div>`;
+        html += `<div style="font-size: 0.9rem; color: #00e676; text-align: right;">Descuento (${discountVal}%): -${formatMoney(discountAmount)}</div>`;
+      }
+      html += `<div class="summary-total">Total a pagar: ${formatMoney(finalTotal)}</div>`;
+      
+      document.getElementById('modal-dynamic-total').innerHTML = html;
+      
+      // Preparar el texto definitivo para copiar y guardar
+      let finalCopyText = pendingSaleData.baseTextForCopy;
+      let historyDesc = pendingSaleData.historyDetails;
+      
+      if(discountVal > 0) {
+        finalCopyText += `\nSUBTOTAL: ${formatMoney(baseTotal)}`;
+        finalCopyText += `\nDESCUENTO (${discountVal}%): -${formatMoney(discountAmount)}`;
+        historyDesc += ` [Descuento ${discountVal}% aplicado]`;
+      }
+      finalCopyText += `\n\nMECÁNICO: ${currentMechanic}`;
+      finalCopyText += `\nTOTAL A PAGAR: ${formatMoney(finalTotal)}\n-------------------------`;
+      
+      pendingSaleData.finalCopyText = finalCopyText;
+      pendingSaleData.finalHistoryDesc = historyDesc;
+      pendingSaleData.finalTotal = finalTotal;
     }
 
     function confirmAndCopySale() {
       if(pendingSaleData) {
-        // 1. Copiar al portapapeles
-        navigator.clipboard.writeText(pendingSaleData.copyText).then(() => {
+        // Copiamos al portapapeles
+        navigator.clipboard.writeText(pendingSaleData.finalCopyText).then(() => {
           
-          // 2. Guardar en Historial
-          const now = new Date();
-          const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-          
-          salesHistory.push({
-            date: dateStr,
+          // Guardamos en Firebase (Firebase detectará el cambio y actualizará la tabla solo)
+          db.collection("sales").add({
+            date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             mechanic: currentMechanic,
-            details: pendingSaleData.historyDetails,
-            total: pendingSaleData.total
+            details: pendingSaleData.finalHistoryDesc,
+            total: pendingSaleData.finalTotal
+          }).then(() => {
+            alert('¡Venta registrada en la nube y ticket copiado!');
+            resetForm();
+            closeModal();
           });
-
-          // 3. Actualizar tabla visual de historial
-          renderHistoryTable();
-
-          // 4. Resetear y cerrar
-          alert('¡Venta Confirmada y Ticket copiado al portapapeles!');
-          pendingSaleData = null;
-          resetForm(); // Vaciar calculadora automáticamente tras vender
-          closeModal();
           
         }).catch(err => console.error('Error al copiar: ', err));
       }
@@ -814,36 +908,12 @@
       document.getElementById('sale-modal').style.display = 'none';
       pendingSaleData = null;
     }
-
-    /* --- HISTORIAL RENDERING --- */
-    function renderHistoryTable() {
-      const tbody = document.getElementById('history-body');
-      
-      if(salesHistory.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="history-empty">Aún no hay ventas registradas en esta sesión.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = ''; // Limpiar tabla
-      // Invertir arreglo para que la última venta salga arriba
-      [...salesHistory].reverse().forEach(sale => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${sale.date}</td>
-          <td style="font-weight:bold; color: var(--primary-yellow);">${sale.mechanic}</td>
-          <td style="text-align:left;">${sale.details}</td>
-          <td style="font-weight:bold;">${formatMoney(sale.total)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
     // Cerrar modal al tocar fuera
     window.onclick = function(event) {
       if (event.target === document.getElementById('sale-modal')) closeModal();
     }
 
-    calculate(); // Inicializar números
+    calculate();
   </script>
 </body>
 </html>
