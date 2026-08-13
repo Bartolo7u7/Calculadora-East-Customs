@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de East Customs</title>
+  <style>
+    :root {
+      --primary-yellow: #f1bf00;
+      --yellow-hover: #d1a600;
+      --bg-black: #080808;
+      --card-bg: rgba(12, 12, 12, 0.88);
+      --border-color: #333333;
+      --text-white: #ffffff;
+      --text-muted: #888888;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial Black', 'Arial', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      background-image: 
+        linear-gradient(180deg, rgba(5, 5, 5, 0.4) 0%, rgba(5, 5, 5, 0.65) 100%),
+        url('91fe9bc5-c2aa-4f35-ab30-2a17b9044401.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: var(--text-white);
+      
+      display: flex;
+      justify-content: center;
+      padding: 30px 4vw;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-wrapper {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .menu-icon {
+      position: absolute;
+      left: 0;
+      background-color: var(--card-bg);
+      border: 1px solid var(--primary-yellow);
+      border-radius: 4px;
+      padding: 6px 10px;
+      color: var(--primary-yellow);
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s;
+    }
+
+    .menu-icon:hover {
+      background-color: var(--primary-yellow);
+      color: #000;
+    }
+
+    .mechanic-display-header {
+      position: absolute;
+      right: 0;
+      color: var(--primary-yellow);
+      font-size: 0.8rem;
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+      background-color: var(--card-bg);
+      padding: 6px 12px;
+      border: 1px solid var(--primary-yellow);
+      border-radius: 4px;
+    }
+
+    header h1 {
+      color: var(--primary-yellow);
+      font-size: 1.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.9);
+      text-align: center;
+    }
+
+    /* SISTEMA DE VISTAS */
+    .view-container {
+      display: none;
+      width: 100%;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .view-container.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SIDEBAR (MENÚ LATERAL) */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 998;
+      display: none;
+      backdrop-filter: blur(3px);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: -300px;
+      width: 260px;
+      height: 100%;
+      background-color: var(--card-bg);
+      border-right: 2px solid var(--primary-yellow);
+      z-index: 999;
+      transition: left 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 5px 0 25px rgba(0,0,0,0.9);
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      font-size: 1.2rem;
+      color: var(--primary-yellow);
+      border-bottom: 1px solid var(--border-color);
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      padding: 15px 0;
+    }
+
+    .sidebar-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-white);
+      padding: 15px 20px;
+      text-align: left;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: all 0.2s;
+      font-family: 'Arial Black', sans-serif;
+    }
+
+    .sidebar-btn:hover, .sidebar-btn.active-nav {
+      background-color: rgba(241, 191, 0, 0.1);
+      border-left: 4px solid var(--primary-yellow);
+      color: var(--primary-yellow);
+    }
+
+    /* PANELES GENERALES */
+    .panel {
+      background-color: var(--card-bg);
+      border: 2px solid var(--primary-yellow);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(241, 191, 0, 0.1);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    /* ESTILOS DE VENTA (CALCULADORA) */
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 25px;
+      align-items: flex-start;
+    }
+
+    .table-container { flex: 0 0 650px; }
+    .calc-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .table-header { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; }
+    .table-header th { padding: 8px 10px; text-align: center; }
+    .category-row { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 0.85rem; padding: 5px; letter-spacing: 0.5px; }
+    .item-row { border-bottom: 1px solid var(--border-color); font-size: 0.82rem; font-family: 'Arial', sans-serif; font-weight: bold; background-color: rgba(0, 0, 0, 0.6); }
+    .item-row td { padding: 6px 10px; vertical-align: middle; }
+
+    .col-pieza { width: 45%; }
+    .col-unidades { width: 18%; text-align: center; }
+    .col-precio { width: 18.5%; text-align: center; }
+    .col-total { width: 18.5%; text-align: center; font-weight: bold; }
+
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: var(--text-white);
+      text-align: center;
+      padding: 4px;
+      font-weight: bold;
+      outline: none;
+      font-size: 0.85rem;
+    }
+    .col-unidades input[type="number"] { max-width: 55px; }
+    input:focus { border-color: var(--primary-yellow); box-shadow: 0 0 5px rgba(241, 191, 0, 0.5); }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .sidebar-layout { display: flex; flex-direction: row; gap: 25px; flex: 1; }
+    .sidebar-col { display: flex; flex-direction: column; gap: 20px; flex: 1; }
+
+    .total-box { padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background-color: rgba(10, 10, 10, 0.95); }
+    .total-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 5px; }
+    .total-amount { color: var(--primary-yellow); }
+
+    .btn {
+      width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: 900;
+      text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; letter-spacing: 0.5px;
+    }
+    .btn-sm { padding: 6px; font-size: 0.7rem; margin-top: 8px; }
+    .btn-yellow { background-color: var(--primary-yellow); color: #000; }
+    .btn-yellow:hover { background-color: var(--yellow-hover); box-shadow: 0 0 10px rgba(241, 191, 0, 0.4); }
+    .btn-green { background-color: #00e676; color: #000; }
+    .btn-green:hover { background-color: #00c853; box-shadow: 0 0 10px rgba(0, 230, 118, 0.4); }
+    .btn-outline { background-color: transparent; border: 1px solid var(--primary-yellow); color: var(--primary-yellow); }
+    .btn-outline:hover { background-color: var(--primary-yellow); color: #000; }
+
+    .info-header { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-align: center; font-size: 0.8rem; padding: 6px; text-transform: uppercase; }
+    .info-content { padding: 12px; font-size: 0.75rem; font-family: 'Arial', sans-serif; background-color: rgba(10, 10, 10, 0.95); }
+    
+    .discount-table { width: 100%; text-align: center; border-collapse: collapse; }
+    .discount-table th, .discount-table td { padding: 6px; border: 1px solid var(--border-color); }
+    .discount-table th { color: var(--primary-yellow); font-size: 0.7rem; }
+
+    .rules-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .rules-list li strong { color: var(--primary-yellow); }
+
+    .tuning-list { display: flex; flex-direction: column; gap: 12px; }
+    .tuning-item { border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .tuning-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .tuning-title { color: var(--primary-yellow); font-weight: 900; margin-bottom: 4px; font-family: 'Arial Black', sans-serif; font-size: 0.8rem; }
+
+    /* ESTILOS DEL MODAL */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
+      z-index: 1000; backdrop-filter: blur(4px);
+    }
+    .modal-content { width: 90%; max-width: 450px; display: flex; flex-direction: column; }
+    .modal-header { background-color: var(--primary-yellow); color: #000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { font-size: 1.1rem; }
+    .close-btn { font-size: 1.5rem; font-weight: bold; cursor: pointer; line-height: 1; }
+    .modal-body { padding: 20px; color: var(--text-white); font-family: 'Arial', sans-serif; font-size: 0.9rem; max-height: 60vh; overflow-y: auto; background-color: rgba(10, 10, 10, 0.95); }
+    .summary-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #555; padding-bottom: 8px; }
+    .summary-total { font-size: 1.2rem; font-weight: 900; color: var(--primary-yellow); text-align: right; margin-top: 15px; font-family: 'Arial Black', sans-serif; }
+    .modal-footer { padding: 15px; display: flex; gap: 10px; background-color: rgba(10, 10, 10, 0.95); border-top: 1px solid var(--border-color); }
+
+    /* ESTILOS ESPECÍFICOS HISTORIAL Y MECÁNICO */
+    .login-box { max-width: 400px; margin: 50px auto; text-align: center; padding: 30px 20px; }
+    .login-box input { max-width: 100%; padding: 12px; margin-bottom: 20px; font-size: 1rem; }
+    
+    .history-box { max-width: 1000px; margin: 0 auto; padding: 0; }
+    .history-table-wrapper { padding: 15px; overflow-x: auto; background-color: rgba(10,10,10,0.9); }
+    .history-table { width: 100%; border-collapse: collapse; text-align: center; font-family: 'Arial', sans-serif; font-size: 0.85rem; }
+    .history-table th { background-color: var(--primary-yellow); color: #000; padding: 10px; font-family: 'Arial Black', sans-serif; font-size: 0.75rem; }
+    .history-table td { padding: 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .history-empty { padding: 20px; text-align: center; color: var(--text-muted); font-style: italic; }
+
+    @media (max-width: 1200px) { .sidebar-layout { flex-direction: column; } }
+    @media (max-width: 900px) {
+      .main-layout { flex-direction: column; align-items: center; }
+      .table-container { flex: auto; width: 100%; }
+      .sidebar-layout { width: 100%; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR (MENÚ LATERAL) -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">MENÚ PRINCIPAL</div>
+    <div class="sidebar-menu">
+      <button class="sidebar-btn" id="nav-mecanico" onclick="switchView('view-mecanico')">👤 MECÁNICO</button>
+      <button class="sidebar-btn active-nav" id="nav-venta" onclick="switchView('view-venta')">💰 VENTA</button>
+      <button class="sidebar-btn" id="nav-historial" onclick="switchView('view-historial')">📋 HISTORIAL</button>
+    </div>
+  </div>
+
+  <div class="app-wrapper">
+    <header>
+      <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+      <h1>CALCULADORA DE EAST CUSTOMS</h1>
+      <div class="mechanic-display-header" id="header-mechanic-name">Mecánico: Anónimo</div>
+    </header>
+
+    <!-- VISTA 1: MECÁNICO (LOGIN) -->
+    <div id="view-mecanico" class="view-container">
+      <div class="panel login-box">
+        <h2 style="color: var(--primary-yellow); margin-bottom: 20px;">INICIAR SESIÓN DE MECÁNICO</h2>
+        <input type="text" id="mechanic-input" placeholder="Ingresa tu nombre...">
+        <button class="btn btn-yellow" onclick="loginMechanic()">GUARDAR MECÁNICO</button>
+        <button class="btn btn-outline" style="margin-top: 15px;" onclick="logoutMechanic()">CERRAR SESIÓN (ANÓNIMO)</button>
+        <p id="login-status-text" style="margin-top: 20px; color: var(--text-muted); font-family: 'Arial', sans-serif;">Actualmente operando como: <strong>Anónimo</strong></p>
+      </div>
+    </div>
+
+    <!-- VISTA 2: VENTA (CALCULADORA PRINCIPAL) -->
+    <div id="view-venta" class="view-container active">
+      <div class="main-layout">
+        <!-- TABLA PRINCIPAL -->
+        <div class="table-container panel">
+          <table class="calc-table">
+            <thead>
+              <tr class="table-header">
+                <th class="col-pieza">PIEZAS</th>
+                <th class="col-unidades">UNIDADES</th>
+                <th class="col-precio">PRECIO</th>
+                <th class="col-total">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Reparación -->
+              <tr><td colspan="4" class="category-row">Reparación</td></tr>
+              <tr class="item-row">
+                <td>Limpieza</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="400" oninput="calculate()"></td>
+                <td class="col-precio">$400</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Reparación</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="800" oninput="calculate()"></td>
+                <td class="col-precio">$800</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Pintura -->
+              <tr><td colspan="4" class="category-row">Pintura</td></tr>
+              <tr class="item-row">
+                <td>Pintura</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="1000" oninput="calculate()"></td>
+                <td class="col-precio">$1.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Cosméticos -->
+              <tr><td colspan="4" class="category-row">Cosméticos</td></tr>
+              <tr class="item-row">
+                <td>Cosméticos</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="3000" oninput="calculate()"></td>
+                <td class="col-precio">$3.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Humo -->
+              <tr><td colspan="4" class="category-row">Humo</td></tr>
+              <tr class="item-row">
+                <td>Humo</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="5000" oninput="calculate()"></td>
+                <td class="col-precio">$5.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Extras -->
+              <tr><td colspan="4" class="category-row">Extras</td></tr>
+              <tr class="item-row">
+                <td>Extras</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="5000" oninput="calculate()"></td>
+                <td class="col-precio">$5.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Neumáticos -->
+              <tr><td colspan="4" class="category-row">Neumáticos</td></tr>
+              <tr class="item-row">
+                <td>Slick</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="6000" oninput="calculate()"></td>
+                <td class="col-precio">$6.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Semi Slick</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="6000" oninput="calculate()"></td>
+                <td class="col-precio">$6.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Offroad</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="6500" oninput="calculate()"></td>
+                <td class="col-precio">$6.500</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Rendimiento -->
+              <tr><td colspan="4" class="category-row">Rendimiento</td></tr>
+              <tr class="item-row">
+                <td>Rendimiento</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="10000" oninput="calculate()"></td>
+                <td class="col-precio">$10.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Ruedas / Llantas -->
+              <tr><td colspan="4" class="category-row">Ruedas / Llantas</td></tr>
+              <tr class="item-row">
+                <td>Rines</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="10000" oninput="calculate()"></td>
+                <td class="col-precio">$10.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Tracción -->
+              <tr><td colspan="4" class="category-row">Tracción</td></tr>
+              <tr class="item-row">
+                <td>Tracción Delantera (FWD)</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="10500" oninput="calculate()"></td>
+                <td class="col-precio">$10.500</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Tracción Trasera (RWD)</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="11500" oninput="calculate()"></td>
+                <td class="col-precio">$11.500</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Tracción Total (AWD)</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="12500" oninput="calculate()"></td>
+                <td class="col-precio">$12.500</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Frenos y Turbo -->
+              <tr><td colspan="4" class="category-row">Frenos y Turbo</td></tr>
+              <tr class="item-row">
+                <td>Freno Cerámico</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="20000" oninput="calculate()"></td>
+                <td class="col-precio">$20.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Turbocharging</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="35000" oninput="calculate()"></td>
+                <td class="col-precio">$35.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+      
+              <!-- Motor -->
+              <tr><td colspan="4" class="category-row">Motor</td></tr>
+              <tr class="item-row">
+                <td>Motor I4</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="25000" oninput="calculate()"></td>
+                <td class="col-precio">$25.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Motor V6</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="35000" oninput="calculate()"></td>
+                <td class="col-precio">$35.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Motor V8</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="45000" oninput="calculate()"></td>
+                <td class="col-precio">$45.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Motor V12</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="500000" oninput="calculate()"></td>
+                <td class="col-precio">$500.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+  
+              <!-- Nitro -->
+              <tr><td colspan="4" class="category-row">Nitro</td></tr>
+              <tr class="item-row">
+                <td>Kit de Nitro</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="1000000" oninput="calculate()"></td>
+                <td class="col-precio">$1.000.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+              <tr class="item-row">
+                <td>Bombona de Nitro</td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="200000" oninput="calculate()"></td>
+                <td class="col-precio">$200.000</td>
+                <td class="col-total">$0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <!-- PANELES FLOTANTES DERECHA -->
+        <div class="sidebar-layout">
+          <div class="sidebar-col">
+            
+            <!-- Bloque Total y Botones -->
+            <div class="total-box panel">
+              <div class="total-title">Total: <span id="grand-total" class="total-amount">$0</span></div>
+              <button class="btn btn-green" onclick="showSaleSummary()">GENERAR TICKET</button>
+              <button class="btn btn-yellow" onclick="copyTotal()">COPIAR MONTO</button>
+              <button class="btn btn-outline" onclick="resetForm()">REINICIAR</button>
+            </div>
+  
+            <!-- Descuentos Aplicados -->
+            <div class="info-card panel">
+              <div class="info-header">DESCUENTOS APLICADOS</div>
+              <div class="info-content">
+                <table class="discount-table">
+                  <thead>
+                    <tr><th>TOTAL</th><th>%</th><th>A PAGAR</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td id="disc-total-5">$0</td><td>5%</td><td id="disc-pay-5">$0</td></tr>
+                    <tr><td id="disc-total-10">$0</td><td>10%</td><td id="disc-pay-10">$0</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+  
+            <!-- Reglamento -->
+            <div class="info-card panel">
+              <div class="info-header">REGLAMENTO DESCUENTOS</div>
+              <div class="info-content">
+                <ul class="rules-list">
+                  <li>1. El valor en <strong>A PAGAR</strong> es el monto final que debe cobrarse al cliente.</li>
+                  <li>2. Solo por <strong>convenio</strong> o <strong>precio mecánico</strong>.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+  
+          <div class="sidebar-col">
+            <div class="info-card panel">
+              <div class="info-header">FULL TUNING (TODO JUNTO)</div>
+              <div class="info-content tuning-list">
+                
+                <div class="tuning-item">
+                  <div class="tuning-title">FULL TUNING V8 - $110.000</div>
+                  <div>Incluye Motor V8, mejoras al máximo y optimización.</div>
+                  <button class="btn btn-green btn-sm" onclick="showPackageSummary('FULL TUNING V8', 110000)">VENDER PAQUETE</button>
+                </div>
+                
+                <div class="tuning-item">
+                  <div class="tuning-title">FULL TUNING V12 - $570.000</div>
+                  <div>Incluye Motor V12, máxima potencia asegurada.</div>
+                  <button class="btn btn-green btn-sm" onclick="showPackageSummary('FULL TUNING V12', 570000)">VENDER PAQUETE</button>
+                </div>
+  
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA 3: HISTORIAL -->
+    <div id="view-historial" class="view-container">
+      <div class="panel history-box">
+        <div class="info-header" style="font-size: 1rem; padding: 12px;">HISTORIAL DE VENTAS</div>
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>FECHA Y HORA</th>
+                <th>MECÁNICO</th>
+                <th>DETALLE DE LA VENTA</th>
+                <th>TOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr><td colspan="4" class="history-empty">Aún no hay ventas registradas en esta sesión.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- Cierre app-wrapper -->
+
+  <!-- MODAL DE RESUMEN DE VENTA -->
+  <div id="sale-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content panel">
+      <div class="modal-header">
+        <h2>TICKET DE VENTA</h2>
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+      </div>
+      <div class="modal-body" id="sale-summary-content">
+        <!-- Contenido Inyectado -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-green" onclick="confirmAndCopySale()">CONFIRMAR Y COPIAR</button>
+        <button class="btn btn-outline" onclick="closeModal()">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* --- VARIABLES GLOBALES DEL SISTEMA --- */
+    let currentMechanic = "Anónimo";
+    let salesHistory = [];
+    let pendingSaleData = null; // Almacena temporalmente la venta antes de confirmarla
+
+    /* --- UTILIDADES --- */
+    function formatMoney(amount) {
+      return '$' + amount.toLocaleString('de-DE');
+    }
+
+    /* --- SISTEMA DE SIDEBAR Y VISTAS --- */
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if(sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+      } else {
+        sidebar.classList.add('open');
+        overlay.style.display = 'block';
+      }
+    }
+
+    function switchView(viewId) {
+      // Ocultar todas las vistas
+      document.querySelectorAll('.view-container').forEach(view => {
+        view.classList.remove('active');
+      });
+      // Quitar clase activa del menú
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.classList.remove('active-nav');
+      });
+
+      // Activar vista seleccionada
+      document.getElementById(viewId).classList.add('active');
+      // Activar botón del menú correspondiente
+      document.getElementById('nav-' + viewId.split('-')[1]).classList.add('active-nav');
+      
+      toggleSidebar(); // Cerrar menú después de hacer click
+    }
+
+    /* --- SISTEMA DE LOGIN (MECÁNICO) --- */
+    function loginMechanic() {
+      const input = document.getElementById('mechanic-input').value.trim();
+      if (input !== "") {
+        currentMechanic = input;
+        updateMechanicDisplays();
+        document.getElementById('mechanic-input').value = '';
+        alert(`Sesión iniciada correctamente como: ${currentMechanic}`);
+        switchView('view-venta'); // Enviar a la calculadora tras loguearse
+      } else {
+        alert("Por favor, ingresa un nombre válido.");
+      }
+    }
+
+    function logoutMechanic() {
+      currentMechanic = "Anónimo";
+      updateMechanicDisplays();
+      alert("Sesión cerrada. Operando como Anónimo.");
+    }
+
+    function updateMechanicDisplays() {
+      document.getElementById('header-mechanic-name').textContent = `Mecánico: ${currentMechanic}`;
+      document.getElementById('login-status-text').innerHTML = `Actualmente operando como: <strong>${currentMechanic}</strong>`;
+    }
+
+    /* --- CALCULADORA PRINCIPAL --- */
+    function calculate() {
+      let grandTotal = 0;
+      const rows = document.querySelectorAll('.item-row');
+
+      rows.forEach(row => {
+        const input = row.querySelector('input');
+        const price = parseFloat(input.dataset.price) || 0;
+        const qty = parseInt(input.value) || 0;
+        const subtotal = price * qty;
+        row.querySelector('.col-total').textContent = formatMoney(subtotal);
+        grandTotal += subtotal;
+      });
+
+      document.getElementById('grand-total').textContent = formatMoney(grandTotal);
+      document.getElementById('disc-total-5').textContent = formatMoney(grandTotal);
+      document.getElementById('disc-pay-5').textContent = formatMoney(Math.round(grandTotal * 0.95));
+      document.getElementById('disc-total-10').textContent = formatMoney(grandTotal);
+      document.getElementById('disc-pay-10').textContent = formatMoney(Math.round(grandTotal * 0.90));
+    }
+
+    function resetForm() {
+      document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
+      calculate();
+    }
+
+    function copyTotal() {
+      const totalText = document.getElementById('grand-total').textContent;
+      navigator.clipboard.writeText(totalText).then(() => {
+        alert('Monto copiado: ' + totalText);
+      }).catch(err => console.error('Error al copiar: ', err));
+    }
+
+    /* --- TICKET DE VENTA Y CONFIRMACIÓN --- */
+    function showSaleSummary() {
+      const rows = document.querySelectorAll('.item-row');
+      let summaryHTML = '';
+      let textForCopy = '--- TICKET EAST CUSTOMS ---\n\n';
+      let textForHistory = ''; // Para la tabla pequeña de historial
+      let total = 0;
+      let hasItems = false;
+
+      rows.forEach(row => {
+        const input = row.querySelector('input');
+        const qty = parseInt(input.value) || 0;
+        
+        if (qty > 0) {
+          hasItems = true;
+          const itemName = row.querySelector('td:first-child').textContent;
+          const price = parseFloat(input.dataset.price) || 0;
+          const subtotal = price * qty;
+          total += subtotal;
+
+          summaryHTML += `<div class="summary-item"><span>${qty}x ${itemName}</span><span>${formatMoney(subtotal)}</span></div>`;
+          textForCopy += `${qty}x ${itemName}: ${formatMoney(subtotal)}\n`;
+          textForHistory += `${qty}x ${itemName}, `;
+        }
+      });
+
+      if (!hasItems) {
+        alert("No hay ningún artículo con unidades en la calculadora.");
+        return;
+      }
+
+      summaryHTML += `<div class="summary-total">Total a pagar: ${formatMoney(total)}</div>`;
+      textForCopy += `\nMECÁNICO: ${currentMechanic}\nTOTAL A PAGAR: ${formatMoney(total)}\n-------------------------`;
+      textForHistory = textForHistory.slice(0, -2); // quitar última coma
+
+      document.getElementById('sale-summary-content').innerHTML = summaryHTML;
+      
+      // Guardar en variable temporal
+      pendingSaleData = {
+        copyText: textForCopy,
+        historyDetails: textForHistory,
+        total: total
+      };
+
+      document.getElementById('sale-modal').style.display = 'flex';
+    }
+
+    function showPackageSummary(packageName, price) {
+      let summaryHTML = `
+        <div class="summary-item"><span>1x ${packageName}</span><span>${formatMoney(price)}</span></div>
+        <div class="summary-total">Total a pagar: ${formatMoney(price)}</div>
+      `;
+      
+      let textForCopy = `--- TICKET EAST CUSTOMS ---\n\n1x ${packageName}: ${formatMoney(price)}\n\nMECÁNICO: ${currentMechanic}\nTOTAL A PAGAR: ${formatMoney(price)}\n-------------------------`;
+
+      document.getElementById('sale-summary-content').innerHTML = summaryHTML;
+      
+      pendingSaleData = {
+        copyText: textForCopy,
+        historyDetails: `1x ${packageName}`,
+        total: price
+      };
+
+      document.getElementById('sale-modal').style.display = 'flex';
+    }
+
+    function confirmAndCopySale() {
+      if(pendingSaleData) {
+        // 1. Copiar al portapapeles
+        navigator.clipboard.writeText(pendingSaleData.copyText).then(() => {
+          
+          // 2. Guardar en Historial
+          const now = new Date();
+          const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+          
+          salesHistory.push({
+            date: dateStr,
+            mechanic: currentMechanic,
+            details: pendingSaleData.historyDetails,
+            total: pendingSaleData.total
+          });
+
+          // 3. Actualizar tabla visual de historial
+          renderHistoryTable();
+
+          // 4. Resetear y cerrar
+          alert('¡Venta Confirmada y Ticket copiado al portapapeles!');
+          pendingSaleData = null;
+          resetForm(); // Vaciar calculadora automáticamente tras vender
+          closeModal();
+          
+        }).catch(err => console.error('Error al copiar: ', err));
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('sale-modal').style.display = 'none';
+      pendingSaleData = null;
+    }
+
+    /* --- HISTORIAL RENDERING --- */
+    function renderHistoryTable() {
+      const tbody = document.getElementById('history-body');
+      
+      if(salesHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="history-empty">Aún no hay ventas registradas en esta sesión.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = ''; // Limpiar tabla
+      // Invertir arreglo para que la última venta salga arriba
+      [...salesHistory].reverse().forEach(sale => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${sale.date}</td>
+          <td style="font-weight:bold; color: var(--primary-yellow);">${sale.mechanic}</td>
+          <td style="text-align:left;">${sale.details}</td>
+          <td style="font-weight:bold;">${formatMoney(sale.total)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Cerrar modal al tocar fuera
+    window.onclick = function(event) {
+      if (event.target === document.getElementById('sale-modal')) closeModal();
+    }
+
+    calculate(); // Inicializar números
+  </script>
+</body>
+</html>
