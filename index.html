@@ -298,7 +298,7 @@
     .history-table th { background-color: var(--primary-yellow); color: #000; padding: 10px; font-family: 'Arial Black', sans-serif; font-size: 0.75rem; }
     .history-table td { padding: 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
     .history-empty { padding: 20px; text-align: center; color: var(--text-muted); font-style: italic; }
-
+    .btn-red { background-color: #ff3b30; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
     @media (max-width: 1200px) { .sidebar-layout { flex-direction: column; } }
     @media (max-width: 900px) {
       .main-layout { flex-direction: column; align-items: center; }
@@ -591,7 +591,11 @@
     <!-- VISTA 3: HISTORIAL -->
     <div id="view-historial" class="view-container">
       <div class="panel history-box">
-        <div class="info-header" style="font-size: 1rem; padding: 12px;">HISTORIAL DE VENTAS</div>
+        <!-- AQUÍ AÑADIMOS EL BOTÓN -->
+        <div class="info-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px;">
+            <span>HISTORIAL DE VENTAS</span>
+            <button class="btn btn-red" style="width: auto; padding: 5px 10px; font-size: 0.7rem;" onclick="clearHistory()">BORRAR TODO</button>
+        </div>
         <div class="history-table-wrapper">
           <table class="history-table">
             <thead>
@@ -600,10 +604,11 @@
                 <th>MECÁNICO</th>
                 <th>DETALLE DE LA VENTA</th>
                 <th>TOTAL COBRADO</th>
+                <th>ACCIÓN</th>
               </tr>
             </thead>
             <tbody id="history-body">
-              <tr><td colspan="4" class="history-empty">Aún no hay ventas registradas en esta sesión.</td></tr>
+              <tr><td colspan="5" class="history-empty">Cargando datos...</td></tr>
             </tbody>
           </table>
         </div>
@@ -699,7 +704,22 @@
     }
 
     function deleteSale(id) {
-       db.collection("sales").doc(id).delete();
+      // 1. Definimos la misma contraseña que usaste en clearHistory
+      const passwordGuard = "mamawebo"; 
+      
+      // 2. Pedimos la contraseña
+      const input = prompt("Introduce la contraseña de administrador para borrar esta venta:");
+
+      // 3. Verificamos
+      if (input === passwordGuard) {
+        if(confirm("¿Estás seguro? Esta acción borrará esta venta de la nube.")) {
+          db.collection("sales").doc(id).delete().then(() => {
+            alert("Venta eliminada.");
+          });
+        }
+      } else if (input !== null) {
+        alert("Contraseña incorrecta. No tienes permiso para borrar.");
+      }
     }
 
     /* --- LÓGICA DE LA CALCULADORA (RESTO DE TUS FUNCIONES) --- */
