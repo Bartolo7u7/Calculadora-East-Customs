@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de East Customs</title>
+  <style>
+    :root {
+      --primary-yellow: #f1bf00;
+      --yellow-hover: #d1a600;
+      --bg-black: #080808;
+      --card-bg: rgba(12, 12, 12, 0.88);
+      --border-color: #333333;
+      --text-white: #ffffff;
+      --text-muted: #888888;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial Black', 'Arial', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      background-image: 
+        linear-gradient(180deg, rgba(5, 5, 5, 0.4) 0%, rgba(5, 5, 5, 0.65) 100%),
+        url('91fe9bc5-c2aa-4f35-ab30-2a17b9044401.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      color: var(--text-white);
+      display: flex;
+      justify-content: center;
+      padding: 20px 10px;
+      min-height: 100vh;
+    }
+
+    .calculator-container {
+      width: 100%;
+      max-width: 650px;
+      background-color: var(--card-bg);
+      border: 2px solid var(--primary-yellow);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(241, 191, 0, 0.2);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    header {
+      background-color: rgba(12, 12, 12, 0.95);
+      text-align: center;
+      padding: 15px 10px;
+      border-bottom: 2px solid var(--primary-yellow);
+      position: relative;
+    }
+
+    .menu-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 1px solid var(--primary-yellow);
+      border-radius: 4px;
+      padding: 4px 8px;
+      color: var(--primary-yellow);
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    header h1 {
+      color: var(--primary-yellow);
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    /* Tabla Principal */
+    .calc-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .table-header {
+      background-color: var(--primary-yellow);
+      color: #000;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .table-header th {
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .category-row {
+      background-color: var(--primary-yellow);
+      color: #000;
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      padding: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .item-row {
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.82rem;
+      font-family: 'Arial', sans-serif;
+      font-weight: bold;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .item-row td {
+      padding: 6px 10px;
+      vertical-align: middle;
+    }
+
+    .col-pieza {
+      width: 45%;
+    }
+
+    .col-unidades {
+      width: 18%;
+      text-align: center;
+    }
+
+    .col-precio {
+      width: 18.5%;
+      text-align: center;
+    }
+
+    .col-total {
+      width: 18.5%;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* Inputs */
+    input[type="number"] {
+      width: 100%;
+      max-width: 55px;
+      background-color: rgba(0, 0, 0, 0.8);
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: var(--text-white);
+      text-align: center;
+      padding: 3px;
+      font-weight: bold;
+      outline: none;
+      font-size: 0.85rem;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--primary-yellow);
+      box-shadow: 0 0 5px rgba(241, 191, 0, 0.5);
+    }
+
+    /* Ocultar flechas de input number */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    /* Sección Inferior */
+    .bottom-section {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: rgba(10, 10, 10, 0.92);
+    }
+
+    .summary-and-packages {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 500px) {
+      .summary-and-packages {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Total y Botones */
+    .total-box {
+      border: 1px solid var(--primary-yellow);
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .total-title {
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+
+    .total-amount {
+      color: var(--primary-yellow);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 7px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-yellow {
+      background-color: var(--primary-yellow);
+      color: #000;
+    }
+
+    .btn-yellow:hover {
+      background-color: var(--yellow-hover);
+      box-shadow: 0 0 10px rgba(241, 191, 0, 0.4);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--primary-yellow);
+      color: var(--primary-yellow);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary-yellow);
+      color: #000;
+    }
+
+    /* Paquetes */
+    .packages-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pkg-card {
+      border: 1px solid var(--primary-yellow);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.7rem;
+      background-color: rgba(0, 0, 0, 0.8);
+      font-family: 'Arial', sans-serif;
+    }
+
+    .pkg-title {
+      color: var(--primary-yellow);
+      font-weight: 900;
+      margin-bottom: 3px;
+      font-family: 'Arial Black', sans-serif;
+    }
+
+    /* Descuentos y Reglamento */
+    .rules-and-discounts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 500px) {
+      .rules-and-discounts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      border: 1px solid var(--primary-yellow);
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .info-header {
+      background-color: var(--primary-yellow);
+      color: #000;
+      font-weight: 900;
+      text-align: center;
+      font-size: 0.75rem;
+      padding: 4px;
+      text-transform: uppercase;
+    }
+
+    .info-content {
+      padding: 8px;
+      font-size: 0.7rem;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .discount-table {
+      width: 100%;
+      text-align: center;
+      border-collapse: collapse;
+    }
+
+    .discount-table th, .discount-table td {
+      padding: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    .discount-table th {
+      color: var(--primary-yellow);
+      font-size: 0.65rem;
+    }
+
+    .rules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator-container">
+    <header>
+      <div class="menu-icon">☰</div>
+      <h1>CALCULADORA DE EAST CUSTOMS</h1>
+    </header>
+
+    <table class="calc-table">
+      <thead>
+        <tr class="table-header">
+          <th class="col-pieza">PIEZAS</th>
+          <th class="col-unidades">UNIDADES</th>
+          <th class="col-precio">PRECIO</th>
+          <th class="col-total">TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Reparación -->
+        <tr><td colspan="4" class="category-row">Reparación</td></tr>
+        <tr class="item-row">
+          <td>Limpieza</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="400" oninput="calculate()"></td>
+          <td class="col-precio">$400</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Reparación</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="800" oninput="calculate()"></td>
+          <td class="col-precio">$800</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Pintura -->
+        <tr><td colspan="4" class="category-row">Pintura</td></tr>
+        <tr class="item-row">
+          <td>Pintura</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="1000" oninput="calculate()"></td>
+          <td class="col-precio">$1.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Cosméticos -->
+        <tr><td colspan="4" class="category-row">Cosméticos</td></tr>
+        <tr class="item-row">
+          <td>Cosméticos</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="3000" oninput="calculate()"></td>
+          <td class="col-precio">$3.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Humo -->
+        <tr><td colspan="4" class="category-row">Humo</td></tr>
+        <tr class="item-row">
+          <td>Humo</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="5000" oninput="calculate()"></td>
+          <td class="col-precio">$5.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Extras -->
+        <tr><td colspan="4" class="category-row">Extras</td></tr>
+        <tr class="item-row">
+          <td>Extras</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="5000" oninput="calculate()"></td>
+          <td class="col-precio">$5.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Neumáticos -->
+        <tr><td colspan="4" class="category-row">Neumáticos</td></tr>
+        <tr class="item-row">
+          <td>Slick</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="6000" oninput="calculate()"></td>
+          <td class="col-precio">$6.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Semi Slick</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="6000" oninput="calculate()"></td>
+          <td class="col-precio">$6.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Offroad</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="6500" oninput="calculate()"></td>
+          <td class="col-precio">$6.500</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Rendimiento -->
+        <tr><td colspan="4" class="category-row">Rendimiento</td></tr>
+        <tr class="item-row">
+          <td>Rendimiento</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="10000" oninput="calculate()"></td>
+          <td class="col-precio">$10.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Ruedas / Llantas -->
+        <tr><td colspan="4" class="category-row">Ruedas / Llantas</td></tr>
+        <tr class="item-row">
+          <td>Rines</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="10000" oninput="calculate()"></td>
+          <td class="col-precio">$10.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Tracción -->
+        <tr><td colspan="4" class="category-row">Tracción</td></tr>
+        <tr class="item-row">
+          <td>Tracción Delantera (FWD)</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="10500" oninput="calculate()"></td>
+          <td class="col-precio">$10.500</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Tracción Trasera (RWD)</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="11500" oninput="calculate()"></td>
+          <td class="col-precio">$11.500</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Tracción Total (AWD)</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="12500" oninput="calculate()"></td>
+          <td class="col-precio">$12.500</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Frenos y Turbo -->
+        <tr><td colspan="4" class="category-row">Frenos y Turbo</td></tr>
+        <tr class="item-row">
+          <td>Freno Cerámico</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="20000" oninput="calculate()"></td>
+          <td class="col-precio">$20.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Turbocharging</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="35000" oninput="calculate()"></td>
+          <td class="col-precio">$35.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+
+        <!-- Motor -->
+        <tr><td colspan="4" class="category-row">Motor</td></tr>
+        <tr class="item-row">
+          <td>Motor I4</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="25000" oninput="calculate()"></td>
+          <td class="col-precio">$25.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Motor V6</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="35000" oninput="calculate()"></td>
+          <td class="col-precio">$35.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Motor V8</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="45000" oninput="calculate()"></td>
+          <td class="col-precio">$45.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+        <tr class="item-row">
+          <td>Motor V12</td>
+          <td class="col-unidades"><input type="number" min="0" value="0" data-price="500000" oninput="calculate()"></td>
+          <td class="col-precio">$500.000</td>
+          <td class="col-total">$0</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bottom-section">
+      <div class="summary-and-packages">
+        <!-- Bloque de Total y Botones -->
+        <div class="total-box">
+          <div class="total-title">Total: <span id="grand-total" class="total-amount">$0</span></div>
+          <button class="btn btn-yellow" onclick="copyTotal()">COPIAR MONTO</button>
+          <button class="btn btn-outline" onclick="resetForm()">REINICIAR</button>
+        </div>
+
+        <!-- Bloque de Paquetes Predefinidos -->
+        <div class="packages-box">
+          <div class="pkg-card">
+            <div class="pkg-title">FULL TUNING V8 $110.000 (TODO JUNTO)</div>
+            <div>Incluye motor V8.</div>
+          </div>
+          <div class="pkg-card">
+            <div class="pkg-title">FULL TUNING V12 $570.000 (TODO JUNTO)</div>
+            <div>Incluye motor V12.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rules-and-discounts">
+        <!-- Descuentos Aplicados -->
+        <div class="info-card">
+          <div class="info-header">DESCUENTOS APLICADOS</div>
+          <div class="info-content">
+            <table class="discount-table">
+              <thead>
+                <tr>
+                  <th>TOTAL</th>
+                  <th>%</th>
+                  <th>A PAGAR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td id="disc-total-5">$0</td>
+                  <td>5%</td>
+                  <td id="disc-pay-5">$0</td>
+                </tr>
+                <tr>
+                  <td id="disc-total-10">$0</td>
+                  <td>10%</td>
+                  <td id="disc-pay-10">$0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reglamento -->
+        <div class="info-card">
+          <div class="info-header">REGLAMENTO DESCUENTOS</div>
+          <div class="info-content">
+            <ul class="rules-list">
+              <li>1. El valor en <strong>A PAGAR</strong> es el monto final que debe cobrarse al cliente.</li>
+              <li>2. Solo por convenio o precio mecánico.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatMoney(amount) {
+      return '$' + amount.toLocaleString('de-DE');
+    }
+
+    function calculate() {
+      let grandTotal = 0;
+      const rows = document.querySelectorAll('.item-row');
+
+      rows.forEach(row => {
+        const input = row.querySelector('input');
+        const price = parseFloat(input.dataset.price) || 0;
+        const qty = parseInt(input.value) || 0;
+        const subtotal = price * qty;
+
+        row.querySelector('.col-total').textContent = formatMoney(subtotal);
+        grandTotal += subtotal;
+      });
+
+      // Actualizar total principal
+      document.getElementById('grand-total').textContent = formatMoney(grandTotal);
+
+      // Actualizar tabla de descuentos
+      document.getElementById('disc-total-5').textContent = formatMoney(grandTotal);
+      document.getElementById('disc-pay-5').textContent = formatMoney(Math.round(grandTotal * 0.95));
+
+      document.getElementById('disc-total-10').textContent = formatMoney(grandTotal);
+      document.getElementById('disc-pay-10').textContent = formatMoney(Math.round(grandTotal * 0.90));
+    }
+
+    function resetForm() {
+      const inputs = document.querySelectorAll('input[type="number"]');
+      inputs.forEach(input => input.value = 0);
+      calculate();
+    }
+
+    function copyTotal() {
+      const totalText = document.getElementById('grand-total').textContent;
+      navigator.clipboard.writeText(totalText).then(() => {
+        alert('Monto copiado al portapapeles: ' + totalText);
+      }).catch(err => {
+        console.error('Error al copiar: ', err);
+      });
+    }
+
+    // Inicializar cálculo en 0
+    calculate();
+  </script>
+</body>
+</html>
