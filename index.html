@@ -18,6 +18,10 @@
       --border-color: #333333;
       --text-white: #ffffff;
       --text-muted: #888888;
+      --btn-red: #c0392b; 
+      --btn-red-hover: #e74c3c;
+      --btn-dark: #1e1e1e; 
+      --btn-dark-hover: #2c3e50;
     }
 
     * {
@@ -30,7 +34,7 @@
     body {
       background-color: var(--bg-black);
       background-image: 
-        linear-gradient(180deg, rgba(5, 5, 5, 0.4) 0%, rgba(5, 5, 5, 0.65) 100%),
+        linear-gradient(180deg, rgba(5, 5, 5, 0.4) 0%, rgba(5, 5, 5, 0.85) 100%),
         url('91fe9bc5-c2aa-4f35-ab30-2a17b9044401.jpg');
       background-size: cover;
       background-position: center;
@@ -53,7 +57,7 @@
       gap: 25px;
     }
 
-    /* HEADER */
+    /* HEADER GLOBAL */
     header {
       display: flex;
       justify-content: center;
@@ -181,25 +185,27 @@
       color: var(--primary-yellow);
     }
 
+    /* ESTILOS DE LA PÁGINA DE INICIO */
+    .home-container { display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+    .home-subtitle { font-size: 1.2rem; color: #fff; letter-spacing: 5px; text-transform: uppercase; text-shadow: 1px 1px 5px rgba(0,0,0,0.9); margin-bottom: 40px; }
+    .home-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; }
+    .home-row { display: flex; gap: 15px; justify-content: center; width: 100%; }
+    .home-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: white; text-transform: uppercase; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.6); text-decoration: none; }
+    .home-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.8); }
+    .home-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .home-text { font-size: 1rem; letter-spacing: 1px; }
+
+    .btn-red-large { flex: 1; padding: 40px 20px; background: linear-gradient(145deg, var(--btn-red), #9e2a1e); }
+    .btn-red-large:hover { background: linear-gradient(145deg, var(--btn-red-hover), var(--btn-red)); }
+    .btn-dark-medium { flex: 1; padding: 25px 15px; background: linear-gradient(145deg, var(--btn-dark), #111); }
+    .btn-dark-medium:hover { background: linear-gradient(145deg, var(--btn-dark-hover), var(--btn-dark)); }
+
     /* PANELES GENERALES */
-    .panel {
-      background-color: var(--card-bg);
-      border: 2px solid var(--primary-yellow);
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(241, 191, 0, 0.1);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
+    .panel { background-color: var(--card-bg); border: 2px solid var(--primary-yellow); border-radius: 6px; overflow: hidden; box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(241, 191, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+    .info-header { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-align: center; font-size: 0.8rem; padding: 6px; text-transform: uppercase; }
 
     /* ESTILOS DE VENTA (CALCULADORA) */
-    .main-layout {
-      display: flex;
-      flex-direction: row;
-      gap: 25px;
-      align-items: flex-start;
-    }
-
+    .main-layout { display: flex; flex-direction: row; gap: 25px; align-items: flex-start; }
     .table-container { flex: 0 0 650px; }
     .calc-table { width: 100%; border-collapse: collapse; text-align: left; }
     .table-header { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; }
@@ -207,24 +213,12 @@
     .category-row { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 0.85rem; padding: 5px; letter-spacing: 0.5px; }
     .item-row { border-bottom: 1px solid var(--border-color); font-size: 0.82rem; font-family: 'Arial', sans-serif; font-weight: bold; background-color: rgba(0, 0, 0, 0.6); }
     .item-row td { padding: 6px 10px; vertical-align: middle; }
-
     .col-pieza { width: 45%; }
     .col-unidades { width: 18%; text-align: center; }
     .col-precio { width: 18.5%; text-align: center; }
     .col-total { width: 18.5%; text-align: center; font-weight: bold; }
 
-    input[type="number"], input[type="text"] {
-      width: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      border: 1px solid #555;
-      border-radius: 4px;
-      color: var(--text-white);
-      text-align: center;
-      padding: 4px;
-      font-weight: bold;
-      outline: none;
-      font-size: 0.85rem;
-    }
+    input[type="number"], input[type="text"] { width: 100%; background-color: rgba(0, 0, 0, 0.8); border: 1px solid #555; border-radius: 4px; color: var(--text-white); text-align: center; padding: 4px; font-weight: bold; outline: none; font-size: 0.85rem; }
     .col-unidades input[type="number"] { max-width: 55px; }
     input:focus, select:focus { border-color: var(--primary-yellow); box-shadow: 0 0 5px rgba(241, 191, 0, 0.5); }
     input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -237,10 +231,7 @@
     .total-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 5px; }
     .total-amount { color: var(--primary-yellow); }
 
-    .btn {
-      width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: 900;
-      text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; letter-spacing: 0.5px;
-    }
+    .btn { width: 100%; padding: 10px; border: none; border-radius: 4px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; letter-spacing: 0.5px; }
     .btn-sm { padding: 6px; font-size: 0.7rem; margin-top: 8px; }
     .btn-yellow { background-color: var(--primary-yellow); color: #000; }
     .btn-yellow:hover { background-color: var(--yellow-hover); box-shadow: 0 0 10px rgba(241, 191, 0, 0.4); }
@@ -248,28 +239,31 @@
     .btn-green:hover { background-color: #00c853; box-shadow: 0 0 10px rgba(0, 230, 118, 0.4); }
     .btn-outline { background-color: transparent; border: 1px solid var(--primary-yellow); color: var(--primary-yellow); }
     .btn-outline:hover { background-color: var(--primary-yellow); color: #000; }
+    .btn-red { background-color: #ff3b30; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
 
-    .info-header { background-color: var(--primary-yellow); color: #000; font-weight: 900; text-align: center; font-size: 0.8rem; padding: 6px; text-transform: uppercase; }
     .info-content { padding: 12px; font-size: 0.75rem; font-family: 'Arial', sans-serif; background-color: rgba(10, 10, 10, 0.95); }
-    
     .discount-table { width: 100%; text-align: center; border-collapse: collapse; }
     .discount-table th, .discount-table td { padding: 6px; border: 1px solid var(--border-color); }
     .discount-table th { color: var(--primary-yellow); font-size: 0.7rem; }
-
     .rules-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
     .rules-list li strong { color: var(--primary-yellow); }
-
     .tuning-list { display: flex; flex-direction: column; gap: 12px; }
     .tuning-item { border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
     .tuning-item:last-child { border-bottom: none; padding-bottom: 0; }
     .tuning-title { color: var(--primary-yellow); font-weight: 900; margin-bottom: 4px; font-family: 'Arial Black', sans-serif; font-size: 0.8rem; }
 
+    /* ESTILOS DE CONVENIOS */
+    .convenios-box { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .convenios-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+    .convenio-card { flex: 1 1 300px; max-width: 450px; background-color: rgba(10, 10, 10, 0.95); border: 1px solid var(--border-color); border-top: 4px solid var(--primary-yellow); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    .convenio-header { background-color: rgba(241, 191, 0, 0.1); color: var(--primary-yellow); padding: 15px; font-size: 1.1rem; font-weight: 900; text-align: center; border-bottom: 1px solid var(--border-color); text-transform: uppercase; }
+    .convenio-body { padding: 15px; font-size: 0.9rem; color: var(--text-white); font-family: 'Arial', sans-serif; }
+    .convenio-body p { margin-bottom: 10px; line-height: 1.4; }
+    .convenio-body ul { margin-left: 20px; color: #ccc; font-size: 0.85rem; line-height: 1.5; }
+    .convenio-body li { margin-bottom: 6px; }
+
     /* ESTILOS DEL MODAL */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center;
-      z-index: 1000; backdrop-filter: blur(4px);
-    }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
     .modal-content { width: 90%; max-width: 450px; display: flex; flex-direction: column; }
     .modal-header { background-color: var(--primary-yellow); color: #000; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
     .modal-header h2 { font-size: 1.1rem; }
@@ -278,32 +272,26 @@
     .summary-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #555; padding-bottom: 8px; }
     .summary-total { font-size: 1.3rem; font-weight: 900; color: var(--primary-yellow); text-align: right; margin-top: 10px; font-family: 'Arial Black', sans-serif; }
     .modal-footer { padding: 15px; display: flex; gap: 10px; background-color: rgba(10, 10, 10, 0.95); border-top: 1px solid var(--border-color); }
-
-    /* Select de Descuentos en Modal */
-    .discount-select {
-      width: 100%; padding: 8px; margin-top: 8px; 
-      background-color: rgba(0,0,0,0.8); color: #fff; 
-      border: 1px solid var(--border-color); border-radius: 4px; 
-      font-weight: bold; outline: none; cursor: pointer;
-    }
+    .discount-select { width: 100%; padding: 8px; margin-top: 8px; background-color: rgba(0,0,0,0.8); color: #fff; border: 1px solid var(--border-color); border-radius: 4px; font-weight: bold; outline: none; cursor: pointer; }
     .discount-select:focus { border-color: var(--primary-yellow); }
 
     /* ESTILOS ESPECÍFICOS HISTORIAL Y MECÁNICO */
     .login-box { max-width: 400px; margin: 50px auto; text-align: center; padding: 30px 20px; }
     .login-box input { max-width: 100%; padding: 12px; margin-bottom: 20px; font-size: 1rem; }
     
-    .history-box { max-width: 1000px; margin: 0 auto; padding: 0; }
+    .history-box { max-width: 1100px; margin: 0 auto; padding: 0; }
     .history-table-wrapper { padding: 15px; overflow-x: auto; background-color: rgba(10,10,10,0.9); }
     .history-table { width: 100%; border-collapse: collapse; text-align: center; font-family: 'Arial', sans-serif; font-size: 0.85rem; }
     .history-table th { background-color: var(--primary-yellow); color: #000; padding: 10px; font-family: 'Arial Black', sans-serif; font-size: 0.75rem; }
     .history-table td { padding: 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
     .history-empty { padding: 20px; text-align: center; color: var(--text-muted); font-style: italic; }
-    .btn-red { background-color: #ff3b30; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
+
     @media (max-width: 1200px) { .sidebar-layout { flex-direction: column; } }
     @media (max-width: 900px) {
       .main-layout { flex-direction: column; align-items: center; }
       .table-container { flex: auto; width: 100%; }
       .sidebar-layout { width: 100%; flex-direction: column; }
+      .home-row { flex-direction: column; }
     }
   </style>
 </head>
@@ -314,8 +302,12 @@
   <div id="sidebar" class="sidebar">
     <div class="sidebar-header">MENÚ PRINCIPAL</div>
     <div class="sidebar-menu">
+      <button class="sidebar-btn active-nav" id="nav-inicio" onclick="switchView('view-inicio')">🏠 INICIO</button>
       <button class="sidebar-btn" id="nav-mecanico" onclick="switchView('view-mecanico')">👤 MECÁNICO</button>
-      <button class="sidebar-btn active-nav" id="nav-venta" onclick="switchView('view-venta')">💰 VENTA</button>
+      <button class="sidebar-btn" id="nav-venta" onclick="switchView('view-venta')">💰 VENTA</button>
+      <button class="sidebar-btn" id="nav-convenios" onclick="switchView('view-convenios')">🤝 CONVENIOS</button>
+      <button class="sidebar-btn" id="nav-sueldos" onclick="switchView('view-sueldos')">💵 SUELDOS</button>
+      <button class="sidebar-btn" id="nav-ganancias" onclick="switchView('view-ganancias')">📈 GANANCIAS</button>
       <button class="sidebar-btn" id="nav-historial" onclick="switchView('view-historial')">📋 HISTORIAL</button>
     </div>
   </div>
@@ -326,6 +318,55 @@
       <h1>CALCULADORA DE EAST CUSTOMS</h1>
       <div class="mechanic-display-header" id="header-mechanic-name">Mecánico: Anónimo</div>
     </header>
+
+    <!-- VISTA 0: INICIO / DASHBOARD -->
+    <div id="view-inicio" class="view-container active">
+      <div class="home-container">
+        <h2 class="home-subtitle">SISTEMA DE GESTIÓN</h2>
+        
+        <div class="home-grid">
+          <!-- Primera fila: Botones Rojos (Operativa) -->
+          <div class="home-row">
+            <button class="home-btn btn-red-large" onclick="switchView('view-venta')">
+              <span class="home-icon">💰</span>
+              <span class="home-text">NUEVA VENTA</span>
+            </button>
+            <button class="home-btn btn-red-large" onclick="switchView('view-historial')">
+              <span class="home-icon">📋</span>
+              <span class="home-text">HISTORIAL DE VENTAS</span>
+            </button>
+          </div>
+          
+          <!-- Segunda fila: Botones Oscuros (Gestión Personal/Dinero) -->
+          <div class="home-row">
+            <button class="home-btn btn-dark-medium" onclick="switchView('view-mecanico')">
+              <span class="home-icon">👤</span>
+              <span class="home-text">PERFIL MECÁNICO</span>
+            </button>
+            <button class="home-btn btn-dark-medium" onclick="switchView('view-sueldos')">
+              <span class="home-icon">💵</span>
+              <span class="home-text">SUELDOS</span>
+            </button>
+            <button class="home-btn btn-dark-medium" onclick="switchView('view-ganancias')">
+              <span class="home-icon">📈</span>
+              <span class="home-text">GANANCIAS</span>
+            </button>
+          </div>
+
+          <!-- Tercera fila: Botones Oscuros (Info y Sistema) -->
+          <div class="home-row">
+            <button class="home-btn btn-dark-medium" onclick="switchView('view-convenios')">
+              <span class="home-icon">🤝</span>
+              <span class="home-text">CONVENIOS ACTIVOS</span>
+            </button>
+            <button class="home-btn btn-dark-medium" onclick="location.reload()">
+              <span class="home-icon">🔄</span>
+              <span class="home-text">RECARGAR SISTEMA</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- VISTA 1: MECÁNICO (LOGIN) -->
     <div id="view-mecanico" class="view-container">
@@ -338,8 +379,77 @@
       </div>
     </div>
 
+    <!-- VISTA: CONVENIOS -->
+    <div id="view-convenios" class="view-container">
+      <div class="panel convenios-box">
+        <div class="info-header" style="font-size: 1.1rem; padding: 12px; margin-bottom: 25px;">ORGANIZACIONES CON CONVENIO</div>
+        
+        <div class="convenios-grid">
+          <!-- EJEMPLO 1: POLICÍA -->
+          <div class="convenio-card">
+            <div class="convenio-header">🍔 Miguel Jefe del BurguerShot</div>
+            <div class="convenio-body">
+              <p><strong style="color: var(--primary-yellow);">Tipo de Trato:</strong> Descuento Mutuo</p>
+              <p><strong style="color: var(--primary-yellow);">Condiciones a aplicar:</strong></p>
+              <ul>
+                <li>Descuento del 10% para este individuo en todas sus compras.</li>
+                <li>Descuento del 10% en la compra de 500 combos del burguer para los miembros del Mecanico (solo con este individuo).</li>
+              </ul>
+            </div>
+          </div>
+          <!-- PUEDES COPIAR Y PEGAR EL BLOQUE DE ARRIBA PARA AÑADIR MÁS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA NUEVA: SUELDOS -->
+    <div id="view-sueldos" class="view-container">
+      <div class="panel history-box">
+        <div class="info-header" style="padding: 12px; font-size: 1.1rem;">CÁLCULO DE SUELDOS (15% POR VENTA)</div>
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>MECÁNICO</th>
+                <th>TOTAL VENTAS GENERADAS</th>
+                <th>SUELDO A PAGAR (15%)</th>
+              </tr>
+            </thead>
+            <tbody id="sueldos-body">
+              <tr><td colspan="3" class="history-empty">Calculando sueldos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA NUEVA: GANANCIAS DEL LOCAL -->
+    <div id="view-ganancias" class="view-container">
+      <div class="panel history-box" style="text-align: center; padding: 40px;">
+        <div class="info-header" style="margin-top: -40px; margin-left: -40px; margin-right: -40px; margin-bottom: 30px; font-size: 1.1rem; padding: 12px;">BALANCE DEL LOCAL (85% POR VENTA)</div>
+        
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+          
+          <div style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; min-width: 250px;">
+            <h3 style="color: #aaa; font-size: 1rem; margin-bottom: 10px; font-family: 'Arial Black', sans-serif;">INGRESOS BRUTOS TOTALES</h3>
+            <p style="font-family: 'Arial', sans-serif; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Dinero total generado de todas las ventas del servidor.</p>
+            <div id="ganancias-brutas" style="font-size: 2.5rem; font-weight: 900; color: #fff;">$0</div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); flex: 1; min-width: 250px; border-top: 4px solid #00b0ff;">
+            <h3 style="color: #00b0ff; font-size: 1rem; margin-bottom: 10px; font-family: 'Arial Black', sans-serif;">GANANCIA NETA DEL LOCAL</h3>
+            <p style="font-family: 'Arial', sans-serif; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Dinero que entra directo a las arcas (Total 100% - Sueldos 15%).</p>
+            <div id="ganancias-netas" style="font-size: 2.5rem; font-weight: 900; color: #00b0ff; text-shadow: 0 0 10px rgba(0, 176, 255, 0.3);">
+              $0
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- VISTA 2: VENTA (CALCULADORA PRINCIPAL) -->
-    <div id="view-venta" class="view-container active">
+    <div id="view-venta" class="view-container">
       <div class="main-layout">
         <!-- TABLA PRINCIPAL -->
         <div class="table-container panel">
@@ -495,7 +605,7 @@
               </tr>
               <tr class="item-row">
                 <td>Motor V8</td>
-                <td class="col-unidades"><input type="number" min="0" value="0" data-price="50.000" oninput="calculate()"></td>
+                <td class="col-unidades"><input type="number" min="0" value="0" data-price="50000" oninput="calculate()"></td>
                 <td class="col-precio">$50.000</td>
                 <td class="col-total">$0</td>
               </tr>
@@ -536,7 +646,7 @@
               <button class="btn btn-outline" onclick="resetForm()">REINICIAR</button>
             </div>
   
-            <!-- Descuentos Aplicados (Solo visual informativo) -->
+            <!-- Descuentos Aplicados -->
             <div class="info-card panel">
               <div class="info-header">DESCUENTOS APLICADOS</div>
               <div class="info-content">
@@ -568,19 +678,16 @@
             <div class="info-card panel">
               <div class="info-header">FULL TUNING (TODO JUNTO)</div>
               <div class="info-content tuning-list">
-                
                 <div class="tuning-item">
                   <div class="tuning-title">FULL TUNING V8 - $110.000</div>
                   <div>Incluye Motor V8, mejoras al máximo y optimización.</div>
                   <button class="btn btn-green btn-sm" onclick="showPackageSummary('FULL TUNING V8', 110000)">VENDER PAQUETE</button>
                 </div>
-                
                 <div class="tuning-item">
                   <div class="tuning-title">FULL TUNING V12 - $570.000</div>
                   <div>Incluye Motor V12, máxima potencia asegurada.</div>
                   <button class="btn btn-green btn-sm" onclick="showPackageSummary('FULL TUNING V12', 570000)">VENDER PAQUETE</button>
                 </div>
-  
               </div>
             </div>
           </div>
@@ -591,7 +698,6 @@
     <!-- VISTA 3: HISTORIAL -->
     <div id="view-historial" class="view-container">
       <div class="panel history-box">
-        <!-- AQUÍ AÑADIMOS EL BOTÓN -->
         <div class="info-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px;">
             <span>HISTORIAL DE VENTAS</span>
             <button class="btn btn-red" style="width: auto; padding: 5px 10px; font-size: 0.7rem;" onclick="clearHistory()">BORRAR TODO</button>
@@ -604,11 +710,13 @@
                 <th>MECÁNICO</th>
                 <th>DETALLE DE LA VENTA</th>
                 <th>TOTAL COBRADO</th>
+                <th style="color: #000000;">SUELDO (15%)</th>
+                <th style="color: #050505;">GANANCIA LOCAL</th>
                 <th>ACCIÓN</th>
               </tr>
             </thead>
             <tbody id="history-body">
-              <tr><td colspan="5" class="history-empty">Cargando datos...</td></tr>
+              <tr><td colspan="7" class="history-empty">Cargando datos...</td></tr>
             </tbody>
           </table>
         </div>
@@ -627,10 +735,8 @@
       
       <div class="modal-body">
         <div id="sale-summary-content">
-          <!-- Contenido Inyectado (Piezas) -->
         </div>
 
-        <!-- SELECCIÓN DE DESCUENTOS EN EL MODAL -->
         <div style="margin-top: 15px; border-top: 1px dashed #555; padding-top: 15px;">
           <label style="color: var(--primary-yellow); font-weight: bold; font-size: 0.85rem;">APLICAR DESCUENTO:</label>
           <select id="modal-discount-select" class="discount-select" onchange="updateModalTotal()">
@@ -641,7 +747,6 @@
         </div>
 
         <div id="modal-dynamic-total" style="margin-top: 15px;">
-          <!-- Contenido inyectado (Totales y Descuentos calculados) -->
         </div>
       </div>
       
@@ -668,16 +773,71 @@
     let currentMechanic = localStorage.getItem('ec_mechanic') || "Anónimo";
     let pendingSaleData = null;
 
-    // Sincronización en tiempo real con Firebase
+    // Sincronización en tiempo real con Firebase (Sueldos y Ganancias)
     db.collection("sales").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-      const tbody = document.getElementById('history-body');
-      tbody.innerHTML = '';
-      snapshot.forEach((doc) => {
-        const s = doc.data();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${s.date}</td><td>${s.mechanic}</td><td style="text-align:left">${s.details}</td><td>$${s.total.toLocaleString('de-DE')}</td><td><button onclick="deleteSale('${doc.id}')" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">X</button></td>`;
-        tbody.appendChild(tr);
-      });
+      const tbodyHistory = document.getElementById('history-body');
+      const tbodySueldos = document.getElementById('sueldos-body');
+      
+      tbodyHistory.innerHTML = '';
+      tbodySueldos.innerHTML = '';
+      
+      let mechanicsData = {}; 
+      let totalVentasGlobal = 0;
+      let totalGananciaLocalGlobal = 0;
+
+      if(snapshot.empty) {
+        tbodyHistory.innerHTML = '<tr><td colspan="7" class="history-empty">Aún no hay ventas registradas.</td></tr>';
+        tbodySueldos.innerHTML = '<tr><td colspan="3" class="history-empty">No hay datos para calcular sueldos.</td></tr>';
+        
+        document.getElementById('ganancias-brutas').textContent = '$0';
+        document.getElementById('ganancias-netas').textContent = '$0';
+      } else {
+        snapshot.forEach((doc) => {
+          const s = doc.data();
+          const sueldoPorVenta = Math.round(s.total * 0.15); // 15% para el mecánico
+          const gananciaLocal = s.total - sueldoPorVenta; // 85% para el local
+
+          // Acumuladores Globales para el panel de Ganancias
+          totalVentasGlobal += s.total;
+          totalGananciaLocalGlobal += gananciaLocal;
+
+          // --- 1. LLENAR HISTORIAL DE VENTAS ---
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${s.date}</td>
+            <td>${s.mechanic}</td>
+            <td style="text-align:left">${s.details}</td>
+            <td>$${s.total.toLocaleString('de-DE')}</td>
+            <td style="color: #00e676; font-weight: bold;">$${sueldoPorVenta.toLocaleString('de-DE')}</td>
+            <td style="color: #00b0ff; font-weight: bold;">$${gananciaLocal.toLocaleString('de-DE')}</td>
+            <td><button onclick="deleteSale('${doc.id}')" style="background:red; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:3px;">X</button></td>
+          `;
+          tbodyHistory.appendChild(tr);
+
+          // --- 2. SUMAR DATOS PARA EL SUELDO TOTAL (Por Mecánico) ---
+          if (!mechanicsData[s.mechanic]) {
+            mechanicsData[s.mechanic] = { totalVendido: 0, totalSueldo: 0 };
+          }
+          mechanicsData[s.mechanic].totalVendido += s.total;
+          mechanicsData[s.mechanic].totalSueldo += sueldoPorVenta;
+        });
+
+        // --- 3. DIBUJAR TABLA DE SUELDOS GLOBALES ---
+        for (const mechanic in mechanicsData) {
+           const datos = mechanicsData[mechanic];
+           const trSueldo = document.createElement('tr');
+           trSueldo.innerHTML = `
+             <td style="font-weight: 900; color: var(--primary-yellow);">${mechanic}</td>
+             <td>$${datos.totalVendido.toLocaleString('de-DE')}</td>
+             <td style="color: #00e676; font-weight: 900; font-size: 1.1rem;">$${datos.totalSueldo.toLocaleString('de-DE')}</td>
+           `;
+           tbodySueldos.appendChild(trSueldo);
+        }
+
+        // --- 4. ACTUALIZAR PANEL DE GANANCIAS ---
+        document.getElementById('ganancias-brutas').textContent = '$' + totalVentasGlobal.toLocaleString('de-DE');
+        document.getElementById('ganancias-netas').textContent = '$' + totalGananciaLocalGlobal.toLocaleString('de-DE');
+      }
     });
 
     /* --- LÓGICA DE FIREBASE --- */
@@ -699,18 +859,16 @@
     function clearHistory() {
       const pass = "mamawebo";
       if(prompt("Introduce la contraseña de administrador:") === pass) {
-        db.collection("sales").get().then(res => res.forEach(doc => doc.ref.delete()));
+        db.collection("sales").get().then(res => {
+            res.forEach(doc => doc.ref.delete());
+            alert("Historial borrado.");
+        });
       }
     }
 
     function deleteSale(id) {
-      // 1. Definimos la misma contraseña que usaste en clearHistory
       const passwordGuard = "mamawebo"; 
-      
-      // 2. Pedimos la contraseña
       const input = prompt("Introduce la contraseña de administrador para borrar esta venta:");
-
-      // 3. Verificamos
       if (input === passwordGuard) {
         if(confirm("¿Estás seguro? Esta acción borrará esta venta de la nube.")) {
           db.collection("sales").doc(id).delete().then(() => {
@@ -722,10 +880,11 @@
       }
     }
 
-    /* --- LÓGICA DE LA CALCULADORA (RESTO DE TUS FUNCIONES) --- */
+    /* --- LÓGICA DE LA CALCULADORA Y NAVEGACIÓN --- */
     function formatMoney(amount) {
       return '$' + amount.toLocaleString('de-DE');
     }
+    
     function toggleSidebar() { 
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('sidebar-overlay');
@@ -737,6 +896,7 @@
         overlay.style.display = 'block';
       } 
     }
+    
     function switchView(viewId) { 
       document.querySelectorAll('.view-container').forEach(view => {
         view.classList.remove('active');
@@ -745,9 +905,16 @@
         btn.classList.remove('active-nav');
       });
       document.getElementById(viewId).classList.add('active');
-      document.getElementById('nav-' + viewId.split('-')[1]).classList.add('active-nav');
-      toggleSidebar();
+      
+      const navBtnId = 'nav-' + viewId.split('-')[1];
+      const navBtn = document.getElementById(navBtnId);
+      if(navBtn) navBtn.classList.add('active-nav');
+      
+      if(document.getElementById('sidebar').classList.contains('open')){
+          toggleSidebar();
+      }
     }
+    
     function loginMechanic() { 
       const input = document.getElementById('mechanic-input').value.trim();
       if (input !== "") {
@@ -755,27 +922,28 @@
         updateMechanicDisplays();
         document.getElementById('mechanic-input').value = '';
         alert(`Sesión iniciada correctamente como: ${currentMechanic}`);
-        switchView('view-venta'); 
+        switchView('view-inicio'); 
       } else {
         alert("Por favor, ingresa un nombre válido.");
       }
     }
+    
     function logoutMechanic() { 
       currentMechanic = "Anónimo";
       updateMechanicDisplays();
       alert("Sesión cerrada. Operando como Anónimo.");
     }
+    
     function updateMechanicDisplays() {
-      // Esta función actualiza el texto del nombre del mecánico en el header y en la vista de login
       const headerDisplay = document.getElementById('header-mechanic-name');
       const loginStatus = document.getElementById('login-status-text');
       
       if (headerDisplay) headerDisplay.textContent = `Mecánico: ${currentMechanic}`;
       if (loginStatus) loginStatus.innerHTML = `Actualmente operando como: <strong>${currentMechanic}</strong>`;
       
-      // Guardamos el nombre en el navegador para que no se borre al refrescar
       localStorage.setItem('ec_mechanic', currentMechanic);
     }
+    
     function calculate() { 
       let grandTotal = 0;
       const rows = document.querySelectorAll('.item-row');
@@ -795,16 +963,19 @@
       document.getElementById('disc-total-10').textContent = formatMoney(grandTotal);
       document.getElementById('disc-pay-10').textContent = formatMoney(Math.round(grandTotal * 0.90));
     }
+    
     function resetForm() {
       document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
       calculate();
     }
+    
     function copyTotal() {
       const totalText = document.getElementById('grand-total').textContent;
       navigator.clipboard.writeText(totalText).then(() => {
         alert('Monto copiado: ' + totalText);
       }).catch(err => console.error('Error al copiar: ', err));
     }
+    
     function showSaleSummary() { 
       const rows = document.querySelectorAll('.item-row');
       let summaryHTML = '';
@@ -837,7 +1008,6 @@
 
       textForHistory = textForHistory.slice(0, -2); 
 
-      // Reiniciar el select a 0%
       document.getElementById('modal-discount-select').value = "0";
       document.getElementById('sale-summary-content').innerHTML = summaryHTML;
       
@@ -847,9 +1017,10 @@
         baseTotal: total
       };
 
-      updateModalTotal(); // Calcula y pinta el total final
+      updateModalTotal();
       document.getElementById('sale-modal').style.display = 'flex';
     }
+    
     function showPackageSummary(packageName, price) {
       let summaryHTML = `<div class="summary-item"><span>1x ${packageName}</span><span>${formatMoney(price)}</span></div>`;
       let baseTextForCopy = `--- TICKET EAST CUSTOMS ---\n\n1x ${packageName}: ${formatMoney(price)}\n`;
@@ -863,11 +1034,10 @@
         baseTotal: price
       };
 
-      updateModalTotal(); // Calcula y pinta el total final
+      updateModalTotal(); 
       document.getElementById('sale-modal').style.display = 'flex';
     }
 
-    // Actualiza los números dentro del modal según el descuento elegido
     function updateModalTotal() {
       if(!pendingSaleData) return;
       
@@ -885,7 +1055,6 @@
       
       document.getElementById('modal-dynamic-total').innerHTML = html;
       
-      // Preparar el texto definitivo para copiar y guardar
       let finalCopyText = pendingSaleData.baseTextForCopy;
       let historyDesc = pendingSaleData.historyDetails;
       
@@ -902,36 +1071,16 @@
       pendingSaleData.finalTotal = finalTotal;
     }
 
-    function confirmAndCopySale() {
-      if(pendingSaleData) {
-        // Copiamos al portapapeles
-        navigator.clipboard.writeText(pendingSaleData.finalCopyText).then(() => {
-          
-          // Guardamos en Firebase (Firebase detectará el cambio y actualizará la tabla solo)
-          db.collection("sales").add({
-            date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            mechanic: currentMechanic,
-            details: pendingSaleData.finalHistoryDesc,
-            total: pendingSaleData.finalTotal
-          }).then(() => {
-            alert('¡Venta registrada en la nube y ticket copiado!');
-            resetForm();
-            closeModal();
-          });
-          
-        }).catch(err => console.error('Error al copiar: ', err));
-      }
-    }
-
     function closeModal() {
       document.getElementById('sale-modal').style.display = 'none';
       pendingSaleData = null;
     }
-    // Cerrar modal al tocar fuera
+    
     window.onclick = function(event) {
       if (event.target === document.getElementById('sale-modal')) closeModal();
     }
+    
+    // Iniciar
     updateMechanicDisplays();
     calculate();
   </script>
