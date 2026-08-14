@@ -241,6 +241,26 @@
     .btn-outline:hover { background-color: var(--primary-yellow); color: #000; }
     .btn-red { background-color: #ff3b30; color: #fff; border: none; cursor: pointer; border-radius: 4px; }
 
+    /* ESTILO NUEVO DEL BOTÓN COBRAR */
+    .btn-cobrar {
+      background-color: #00e676;
+      color: #000;
+      border: none;
+      padding: 8px 15px;
+      font-weight: 900;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Arial Black', sans-serif;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btn-cobrar:hover {
+      background-color: #00c853;
+      box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+      transform: scale(1.05);
+    }
+
     .info-content { padding: 12px; font-size: 0.75rem; font-family: 'Arial', sans-serif; background-color: rgba(10, 10, 10, 0.95); }
     .discount-table { width: 100%; text-align: center; border-collapse: collapse; }
     .discount-table th, .discount-table td { padding: 6px; border: 1px solid var(--border-color); }
@@ -413,10 +433,11 @@
                 <th>MECÁNICO</th>
                 <th>TOTAL VENTAS GENERADAS</th>
                 <th>SUELDO A PAGAR (15%)</th>
+                <th>ACCIÓN</th>
               </tr>
             </thead>
             <tbody id="sueldos-body">
-              <tr><td colspan="3" class="history-empty">Calculando sueldos...</td></tr>
+              <tr><td colspan="4" class="history-empty">Calculando sueldos...</td></tr>
             </tbody>
           </table>
         </div>
@@ -787,7 +808,7 @@
 
       if(snapshot.empty) {
         tbodyHistory.innerHTML = '<tr><td colspan="7" class="history-empty">Aún no hay ventas registradas.</td></tr>';
-        tbodySueldos.innerHTML = '<tr><td colspan="3" class="history-empty">No hay datos para calcular sueldos.</td></tr>';
+        tbodySueldos.innerHTML = '<tr><td colspan="4" class="history-empty">No hay datos para calcular sueldos.</td></tr>';
         
         document.getElementById('ganancias-brutas').textContent = '$0';
         document.getElementById('ganancias-netas').textContent = '$0';
@@ -797,7 +818,7 @@
           const sueldoPorVenta = Math.round(s.total * 0.15); // 15% para el mecánico
           const gananciaLocal = s.total - sueldoPorVenta; // 85% para el local
 
-          // Acumuladores Globales para el panel de Ganancias
+          // Acumuladores Globales para el panel de Ganancias (Muestra todo el histórico)
           totalVentasGlobal += s.total;
           totalGananciaLocalGlobal += gananciaLocal;
 
@@ -814,24 +835,39 @@
           `;
           tbodyHistory.appendChild(tr);
 
-          // --- 2. SUMAR DATOS PARA EL SUELDO TOTAL (Por Mecánico) ---
-          if (!mechanicsData[s.mechanic]) {
-            mechanicsData[s.mechanic] = { totalVendido: 0, totalSueldo: 0 };
+          // --- 2. SUMAR DATOS PARA EL SUELDO (SOLO SI NO ESTÁ PAGADO) ---
+          if (!s.paid) {
+            if (!mechanicsData[s.mechanic]) {
+              mechanicsData[s.mechanic] = { totalVendido: 0, totalSueldo: 0, unpaidDocs: [] };
+            }
+            mechanicsData[s.mechanic].totalVendido += s.total;
+            mechanicsData[s.mechanic].totalSueldo += sueldoPorVenta;
+            mechanicsData[s.mechanic].unpaidDocs.push(doc.id); // Guardamos qué ventas debe cobrar
           }
-          mechanicsData[s.mechanic].totalVendido += s.total;
-          mechanicsData[s.mechanic].totalSueldo += sueldoPorVenta;
         });
 
-        // --- 3. DIBUJAR TABLA DE SUELDOS GLOBALES ---
+        // --- 3. DIBUJAR TABLA DE SUELDOS CON EL BOTÓN COBRAR ---
+        let hasUnpaidSalaries = false;
         for (const mechanic in mechanicsData) {
+           hasUnpaidSalaries = true;
            const datos = mechanicsData[mechanic];
+           // Convertimos los IDs pendientes a un string seguro para enviarlo por onclick
+           const docIdsString = datos.unpaidDocs.join(',');
+
            const trSueldo = document.createElement('tr');
            trSueldo.innerHTML = `
              <td style="font-weight: 900; color: var(--primary-yellow);">${mechanic}</td>
              <td>$${datos.totalVendido.toLocaleString('de-DE')}</td>
              <td style="color: #00e676; font-weight: 900; font-size: 1.1rem;">$${datos.totalSueldo.toLocaleString('de-DE')}</td>
+             <td>
+               <button class="btn-cobrar" onclick="cobrarSueldo('${mechanic}', '${docIdsString}')">Cobrar</button>
+             </td>
            `;
            tbodySueldos.appendChild(trSueldo);
+        }
+
+        if (!hasUnpaidSalaries) {
+          tbodySueldos.innerHTML = '<tr><td colspan="4" class="history-empty">No hay sueldos pendientes por cobrar.</td></tr>';
         }
 
         // --- 4. ACTUALIZAR PANEL DE GANANCIAS ---
@@ -839,6 +875,30 @@
         document.getElementById('ganancias-netas').textContent = '$' + totalGananciaLocalGlobal.toLocaleString('de-DE');
       }
     });
+
+    /* --- LÓGICA DE COBRO DE SUELDOS (NUEVA FUNCIÓN) --- */
+    function cobrarSueldo(mechanicName, docIdsString) {
+      if (!docIdsString) return;
+      const docIds = docIdsString.split(',');
+      
+      const confirmar = confirm(`¿Estás seguro de que quieres liquidar el sueldo de ${mechanicName}? Esto reiniciará sus métricas de sueldo a cero.`);
+      
+      if (confirmar) {
+        // Usamos batch de Firestore para actualizar múltiples ventas a la vez
+        const batch = db.batch();
+        docIds.forEach(id => {
+          const docRef = db.collection("sales").doc(id);
+          batch.update(docRef, { paid: true }); // Marcamos la venta como pagada al mecánico
+        });
+        
+        batch.commit().then(() => {
+          alert(`Sueldo de ${mechanicName} cobrado exitosamente.`);
+        }).catch((error) => {
+          console.error("Error al cobrar sueldo:", error);
+          alert("Hubo un error al procesar el cobro en la base de datos.");
+        });
+      }
+    }
 
     /* --- LÓGICA DE FIREBASE --- */
     function confirmAndCopySale() {
@@ -849,7 +909,8 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         mechanic: currentMechanic,
         details: pendingSaleData.finalHistoryDesc,
-        total: pendingSaleData.finalTotal
+        total: pendingSaleData.finalTotal,
+        paid: false // <--- NUEVO: Toda nueva venta inicia como 'no pagada' al mecánico
       }).then(() => {
         alert('Registrado en la nube');
         closeModal();
