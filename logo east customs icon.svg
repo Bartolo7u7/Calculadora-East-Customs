@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fondo oscuro con bordes redondeados -->
+  <rect width="512" height="512" fill="#080808" rx="64" />
+  
+  <!-- Escudo Exterior Amarillo -->
+  <path d="M 256 30 L 440 80 L 410 320 C 350 400 256 460 256 460 C 256 460 162 400 102 320 L 72 80 Z" fill="none" stroke="#f1bf00" stroke-width="12" stroke-linejoin="round" />
+  
+  <!-- Escudo Interior Gris Oscuro -->
+  <path d="M 256 50 L 415 95 L 390 310 C 335 380 256 435 256 435 C 256 435 177 380 122 310 L 97 95 Z" fill="#0c0c0c" stroke="#222222" stroke-width="4" stroke-linejoin="round" />
+
+  <!-- Turbocompresor (Estilizado) -->
+  <!-- Caracola del turbo blanca -->
+  <path d="M 256 140 C 320 140 360 180 360 240 C 360 300 320 340 256 340 C 200 340 160 300 160 240 C 160 200 180 170 220 160" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" />
+  
+  <!-- Boca de admisión/escape del turbo -->
+  <path d="M 360 240 L 360 150 L 290 150" fill="none" stroke="#ffffff" stroke-width="28" stroke-linejoin="round" />
+
+  <!-- Centro del Turbo y Aspas (Impeller) Amarillas -->
+  <circle cx="256" cy="240" r="45" fill="#080808" stroke="#f1bf00" stroke-width="6" />
+  <!-- Aspas -->
+  <path d="M 256 240 L 256 195" stroke="#f1bf00" stroke-width="7" stroke-linecap="round" />
+  <path d="M 256 240 L 295 262" stroke="#f1bf00" stroke-width="7" stroke-linecap="round" />
+  <path d="M 256 240 L 217 262" stroke="#f1bf00" stroke-width="7" stroke-linecap="round" />
+  <path d="M 256 240 L 225 205" stroke="#f1bf00" stroke-width="7" stroke-linecap="round" />
+  <path d="M 256 240 L 287 205" stroke="#f1bf00" stroke-width="7" stroke-linecap="round" />
+  <path d="M 256 240 L 256 285" stroke="#f1bf00" stroke-width="7" stroke-linecap="round" />
+  <!-- Tuerca central -->
+  <circle cx="256" cy="240" r="12" fill="#f1bf00" />
+
+  <!-- Tipografía Integrada dentro de la base del escudo -->
+  <text x="256" y="380" font-family="Arial Black, Arial, sans-serif" font-size="52" font-weight="900" fill="#f1bf00" text-anchor="middle" letter-spacing="3">EAST</text>
+  <text x="256" y="415" font-family="Arial Black, Arial, sans-serif" font-size="22" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="10">CUSTOMS</text>
+</svg>
